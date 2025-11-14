@@ -1,6 +1,6 @@
 import socket
 
-def read_novatel_tcp(host="192.168.3.3", port=2000):
+def read_novatel_tcp(host="192.168.3.22", port=2000):
     """ Read Novatel GPS data through TCP """
     try:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -15,6 +15,8 @@ def read_novatel_tcp(host="192.168.3.3", port=2000):
                     print(parse_gpgga(data))
                 if data.startswith("#BESTPOSA"):
                     print(parse_bestposa(data))
+                if data.startswith("#INSPVAA"):
+                    print(parse_inspva(data))
                 # print(data[1]+data[2]+data[3]+data[4]+data[5]+data[6])
 
     except socket.error as e:
@@ -55,11 +57,31 @@ def parse_bestposa(bestposa_str):
         return None
 
     try:
-        lat = float(parts[12])
-        lon = float(parts[13])
-        alt = float(parts[14])
+        lat = float(parts[11])
+        lon = float(parts[12])
+        alt = float(parts[13])
         status = parts[5]
         return {"latitude": lat, "longitude": lon, "altitude": alt, "status": status}
+    except (ValueError, IndexError):
+        return None
+    
+def parse_inspva(inspva_str):
+    """Decode inspva"""
+    # if not bestposa_str.startswith("#BESTPOSA"):
+    #     return None
+
+    # parts = bestposa_str.split(";")[0].split(",")
+    parts = inspva_str.split(",")
+    print(len(parts))
+    if len(parts) < 12:
+        return None
+
+    try:
+        lat = float(parts[11])
+        lon = float(parts[12])
+        yaw = float(parts[19])
+        status = parts[5]
+        return {"latitude": lat, "longitude": lon, "altitude": yaw, "status": status}
     except (ValueError, IndexError):
         return None
 

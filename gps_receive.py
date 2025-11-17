@@ -77,11 +77,16 @@ def parse_inspva(inspva_str):
         return None
 
     try:
-        lat = float(parts[11])
+        lat = float(parts[11])      # The doc of each data is in https://docs.novatel.com/OEM7/Content/SPAN_Logs/INSPVA.htm
         lon = float(parts[12])
+        north_velocity = float(parts[14])
+        east_velocity = float(parts[15])
+        roll = float(parts[17])
+        pitch = float(parts[18])
         yaw = float(parts[19])
         status = parts[5]
-        return {"latitude": lat, "longitude": lon, "altitude": yaw, "status": status}
+
+        return {"latitude": lat, "longitude": lon, "north_velocity": north_velocity, "east_velocity": east_velocity, "roll": roll, "pitch": pitch, "altitude": yaw, "status": status}
     except (ValueError, IndexError):
         return None
 
